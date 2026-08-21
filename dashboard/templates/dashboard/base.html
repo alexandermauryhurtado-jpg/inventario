@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Sistema de Inventario{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'dashboard/css/estilos.css' %}">
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <aside class="barra-lateral">
+
+            <h2> Inventario</h2>
+
+            <nav>
+                <a href="/"> Inicio</a>
+                <a href="/productos/"> Productos</a>
+                <a href="/clientes/"> Clientes</a>
+                <a href="/proveedores/"> Proveedores</a>
+                <a href="/movimientos/"> Movimientos</a>
+                <a href="/ventas/"> Ventas</a>
+            </nav>
+
+        </aside>
+
+        <main class="contenido">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

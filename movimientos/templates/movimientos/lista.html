@@ -1,0 +1,122 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Movimientos | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Movimientos</h1>
+            <p>Consulta las entradas y salidas del inventario.</p>
+        </div>
+
+        <a
+          href="/movimientos/nuevo/"
+          class="boton-principal"
+          >
+             Nuevo movimiento
+        </a>
+
+    </div>
+
+
+    <div class="tabla-contenedor">
+
+        <table class="tabla-movimientos">
+
+            <thead>
+
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Proveedor</th>
+                    <th>Motivo</th>
+                    <th>Observaciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for movimiento in movimientos %}
+
+                <tr>
+
+                    <td>
+                        {{ movimiento.fecha|date:"d/m/Y H:i" }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ movimiento.producto.nombre }}
+                        </strong>
+                    </td>
+
+                    <td>
+
+                        {% if movimiento.tipo == 'ENTRADA' %}
+
+                            <span class="estado-activo">
+                                 Entrada
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado-inactivo">
+                                 Salida
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ movimiento.cantidad }}
+                    </td>
+
+                    <td>
+
+                        {% if movimiento.proveedor %}
+                            {{ movimiento.proveedor.nombre }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ movimiento.motivo|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ movimiento.observaciones|default:"—" }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7">
+                        No hay movimientos registrados.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

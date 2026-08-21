@@ -1,0 +1,145 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Editar producto | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Editar producto</h1>
+            <p>Modifica la información del producto.</p>
+        </div>
+
+        <a href="/productos/" class="boton-secundario">
+            ← Volver
+        </a>
+
+    </div>
+
+
+    <div class="formulario-contenedor">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="formulario-grid">
+
+                <div class="campo">
+                    <label>Código</label>
+
+                    <input
+                        type="text"
+                        name="codigo"
+                        value="{{ producto.codigo }}"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Nombre</label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        value="{{ producto.nombre }}"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo campo-completo">
+                    <label>Descripción</label>
+
+                    <textarea
+                        name="descripcion"
+                        rows="3"
+                    >{{ producto.descripcion }}</textarea>
+                </div>
+
+
+                <div class="campo">
+                    <label>Precio de compra</label>
+
+                    <input
+                        type="number"
+                        name="precio_compra"
+                        value="{{ producto.precio_compra }}"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Precio de venta</label>
+
+                    <input
+                        type="number"
+                        name="precio_venta"
+                        value="{{ producto.precio_venta }}"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Stock</label>
+
+                    <input
+                        type="number"
+                        name="stock"
+                        value="{{ producto.stock }}"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Stock mínimo</label>
+
+                    <input
+                        type="number"
+                        name="stock_minimo"
+                        value="{{ producto.stock_minimo }}"
+                        min="0"
+                        required
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="acciones-formulario">
+
+                <a
+                    href="/productos/"
+                    class="boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                >
+                     Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

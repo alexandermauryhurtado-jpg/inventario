@@ -1,0 +1,131 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Editar cliente | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Editar cliente</h1>
+            <p>Modifica la información del cliente.</p>
+        </div>
+
+        <a href="/clientes/" class="boton-secundario">
+            ← Volver
+        </a>
+
+    </div>
+
+    <div class="formulario-contenedor">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if error %}
+
+            <div class="mensaje-error">
+                ⚠️ {{ error }}
+            </div>
+
+            {% endif %}
+
+            <div class="formulario-grid">
+
+                <div class="campo">
+                    <label>Nombre</label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        maxlength="150"
+                        value="{{ cliente.nombre }}"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Documento</label>
+
+                    <input
+                        type="text"
+                        name="documento"
+                        maxlength="30"
+                        value="{{ cliente.documento }}"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Teléfono</label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        maxlength="30"
+                        value="{{ cliente.telefono }}"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Correo</label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        value="{{ cliente.correo }}"
+                    >
+                </div>
+
+                <div class="campo campo-completo">
+                    <label>Dirección</label>
+
+                    <input
+                        type="text"
+                        name="direccion"
+                        maxlength="200"
+                        value="{{ cliente.direccion }}"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Ciudad</label>
+
+                    <input
+                        type="text"
+                        name="ciudad"
+                        maxlength="100"
+                        value="{{ cliente.ciudad }}"
+                    >
+                </div>
+
+            </div>
+
+            <div class="acciones-formulario">
+
+                <a
+                    href="/clientes/"
+                    class="boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                >
+                     Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Nuevo proveedor | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Nuevo proveedor</h1>
+            <p>Registra un nuevo proveedor en el sistema.</p>
+        </div>
+
+    </div>
+
+    <div class="formulario-contenedor">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if error %}
+
+                <div class="mensaje-error">
+                    ⚠️ {{ error }}
+                </div>
+
+            {% endif %}
+
+            <div class="formulario-grid">
+
+                <div class="campo">
+                    <label>Nombre</label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Documento</label>
+
+                    <input
+                        type="text"
+                        name="documento"
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Teléfono</label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        maxlength="30"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Correo</label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                    >
+                </div>
+
+                <div class="campo campo-completo">
+                    <label>Dirección</label>
+
+                    <input
+                        type="text"
+                        name="direccion"
+                        maxlength="200"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label>Ciudad</label>
+
+                    <input
+                        type="text"
+                        name="ciudad"
+                        maxlength="100"
+                        value="Barranquilla"
+                    >
+                </div>
+
+            </div>
+
+            <div class="acciones-formulario">
+
+                <a
+                    href="/proveedores/"
+                    class="boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                >
+                     Guardar 
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

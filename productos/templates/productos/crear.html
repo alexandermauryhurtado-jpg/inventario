@@ -1,0 +1,137 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Nuevo producto | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1>Nuevo producto</h1>
+            <p>Registra un nuevo producto en el inventario.</p>
+        </div>
+
+        <a href="/productos/" class="boton-secundario">
+            ← Volver
+        </a>
+
+    </div>
+
+
+    <div class="formulario-contenedor">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="formulario-grid">
+
+                <div class="campo">
+                    <label>Código</label>
+
+                    <input
+                        type="text"
+                        name="codigo"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Nombre</label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo campo-completo">
+                    <label>Descripción</label>
+
+                    <textarea
+                        name="descripcion"
+                        rows="3"
+                    ></textarea>
+                </div>
+
+
+                <div class="campo">
+                    <label>Precio de compra</label>
+
+                    <input
+                        type="number"
+                        name="precio_compra"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Precio de venta</label>
+
+                    <input
+                        type="number"
+                        name="precio_venta"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Stock inicial</label>
+
+                    <input
+                        type="number"
+                        name="stock"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="campo">
+                    <label>Stock mínimo</label>
+
+                    <input
+                        type="number"
+                        name="stock_minimo"
+                        min="0"
+                        value="0"
+                        required
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="acciones-formulario">
+
+                <a href="/productos/" class="boton-secundario">
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                >
+                     Guardar producto
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

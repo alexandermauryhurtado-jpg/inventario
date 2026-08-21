@@ -1,0 +1,476 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Nueva venta | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos venta-contenedor">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Nueva venta</h1>
+            <p>Registra una nueva venta.</p>
+        </div>
+
+    </div>
+
+
+        <div class="formulario-contenedor venta-cliente">
+
+            <form method="POST">
+
+            {% csrf_token %}
+
+
+            {% if error %}
+
+                <div class="mensaje-error">
+                    ⚠️ {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <!-- CLIENTE -->
+
+            <div class="campo campo-completo">
+
+                <label>Cliente</label>
+
+                <select name="cliente">
+
+                    <option value="">
+                        Consumidor final
+                    </option>
+
+                    {% for cliente in clientes %}
+
+                    <option value="{{ cliente.id }}">
+                        {{ cliente.nombre }} - {{ cliente.documento }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- BUSCADOR -->
+
+            <div class="campo campo-completo venta-buscador">
+
+                <label>🔎 Buscar producto</label>
+
+                <input
+                    type="text"
+                    id="buscar-producto"
+                    placeholder="Escribe el nombre del producto..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- RESULTADOS -->
+
+        <div id="resultados-productos">
+
+           {% for producto in productos %}
+
+    <div
+        class="producto-resultado"
+        data-nombre="{{ producto.nombre|lower }}"
+       >
+
+        <div class="producto-info">
+
+            <strong>
+                {{ producto.nombre }}
+            </strong>
+
+            <div class="producto-detalles">
+
+                <span>
+                    📦 Stock: {{ producto.stock }}
+                </span>
+
+                <span class="producto-precio">
+                    ${{ producto.precio_venta }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="boton-principal boton-agregar"
+            data-id="{{ producto.id }}"
+            data-nombre="{{ producto.nombre }}"
+            data-precio="{{ producto.precio_venta }}"
+            data-stock="{{ producto.stock }}"
+        >
+            ➕ Agregar
+        </button>
+
+    </div>
+
+            {% endfor %}
+
+            
+
+
+            <!-- CARRITO -->
+
+            <div class="carrito-venta">
+
+                <h2>🛒 Productos de la venta</h2>
+
+
+                <div id="carrito-vacio">
+
+                    <p>
+                        No hay productos agregados.
+                    </p>
+
+                </div>
+
+
+                <div id="carrito-productos"></div>
+
+
+                <div class="total-venta">
+
+                    <span>Total:</span>
+
+                    <strong id="total">
+                        $0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- DATOS QUE ENVIAREMOS AL BACKEND -->
+
+            <div id="datos-venta"></div>
+
+
+            <!-- ACCIONES -->
+
+            <div class="acciones-formulario">
+
+                <a
+                    href="/ventas/"
+                    class="boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                    id="confirmar-venta"
+                    disabled
+                >
+                     Confirmar venta
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const buscador = document.getElementById('buscar-producto');
+const resultados = document.querySelectorAll('.producto-resultado');
+const carrito = [];
+const carritoContenedor = document.getElementById('carrito-productos');
+const carritoVacio = document.getElementById('carrito-vacio');
+const totalElemento = document.getElementById('total');
+const botonConfirmar = document.getElementById('confirmar-venta');
+const datosVenta = document.getElementById('datos-venta');
+
+
+// BUSCAR PRODUCTOS
+
+buscador.addEventListener('input', function () {
+
+    const texto = this.value.toLowerCase().trim();
+
+    resultados.forEach(function (resultado) {
+
+        const nombre = resultado.dataset.nombre;
+
+        if (nombre.includes(texto)) {
+
+            resultado.style.display = 'flex';
+
+        } else {
+
+            resultado.style.display = 'none';
+
+        }
+
+    });
+
+});
+
+
+// AGREGAR PRODUCTO
+
+document.querySelectorAll('.boton-agregar').forEach(function (boton) {
+
+    boton.addEventListener('click', function () {
+
+        const id = this.dataset.id;
+        const nombre = this.dataset.nombre;
+        const precio = parseFloat(this.dataset.precio);
+        const stock = parseInt(this.dataset.stock);
+
+
+        const existente = carrito.find(function (item) {
+
+            return item.id === id;
+
+        });
+
+
+        if (existente) {
+
+            if (existente.cantidad < stock) {
+
+                existente.cantidad++;
+
+            }
+
+        } else {
+
+            carrito.push({
+
+                id: id,
+                nombre: nombre,
+                precio: precio,
+                stock: stock,
+                cantidad: 1
+
+            });
+
+        }
+
+
+        actualizarCarrito();
+
+    });
+
+});
+
+
+// ACTUALIZAR CARRITO
+
+function actualizarCarrito() {
+
+    carritoContenedor.innerHTML = '';
+
+    let total = 0;
+
+
+    if (carrito.length === 0) {
+
+        carritoVacio.style.display = 'block';
+
+        botonConfirmar.disabled = true;
+
+        totalElemento.textContent = '$0';
+
+        return;
+
+    }
+
+
+    carritoVacio.style.display = 'none';
+
+    botonConfirmar.disabled = false;
+
+
+    carrito.forEach(function (item, indice) {
+
+        const subtotal = item.precio * item.cantidad;
+
+        total += subtotal;
+
+
+       const fila = document.createElement('div');
+
+        fila.className = 'producto-carrito';
+
+    fila.innerHTML = `
+
+    <div class="carrito-producto-info">
+
+        <strong>${item.nombre}</strong>
+
+        <p>
+            $${item.precio.toLocaleString('es-CO')} c/u
+        </p>
+
+    </div>
+
+
+    <div>
+
+        <button
+            type="button"
+            onclick="cambiarCantidad(${indice}, -1)"
+        >
+            ➖
+        </button>
+
+        <strong>
+            ${item.cantidad}
+        </strong>
+
+        <button
+            type="button"
+            onclick="cambiarCantidad(${indice}, 1)"
+        >
+            ➕
+        </button>
+
+    </div>
+
+
+    <strong>
+        $${subtotal.toLocaleString('es-CO')}
+    </strong>
+
+
+    <button
+        type="button"
+        onclick="eliminarProducto(${indice})"
+    >
+        🗑️
+    </button>
+
+    `;
+
+
+        carritoContenedor.appendChild(fila);
+
+    });
+
+
+    totalElemento.textContent =
+        '$' + total.toLocaleString('es-CO');
+
+
+    prepararDatosVenta();
+
+}
+
+
+// CAMBIAR CANTIDAD
+
+function cambiarCantidad(indice, cambio) {
+
+    const item = carrito[indice];
+
+    const nuevaCantidad = item.cantidad + cambio;
+
+
+    if (nuevaCantidad < 1) {
+
+        return;
+
+    }
+
+
+    if (nuevaCantidad > item.stock) {
+
+        alert(
+            'No puedes superar el stock disponible: '
+            + item.stock
+        );
+
+        return;
+
+    }
+
+
+    item.cantidad = nuevaCantidad;
+
+    actualizarCarrito();
+
+}
+
+
+// ELIMINAR PRODUCTO
+
+function eliminarProducto(indice) {
+
+    carrito.splice(indice, 1);
+
+    actualizarCarrito();
+
+}
+
+
+// PREPARAR DATOS PARA DJANGO
+
+function prepararDatosVenta() {
+
+    datosVenta.innerHTML = '';
+
+
+    carrito.forEach(function (item, indice) {
+
+        const productoInput = document.createElement('input');
+
+        productoInput.type = 'hidden';
+
+        productoInput.name = `producto_${indice}`;
+
+        productoInput.value = item.id;
+
+
+        const cantidadInput = document.createElement('input');
+
+        cantidadInput.type = 'hidden';
+
+        cantidadInput.name = `cantidad_${indice}`;
+
+        cantidadInput.value = item.cantidad;
+
+
+        datosVenta.appendChild(productoInput);
+
+        datosVenta.appendChild(cantidadInput);
+
+    });
+
+
+    const cantidadProductos = document.createElement('input');
+
+    cantidadProductos.type = 'hidden';
+
+    cantidadProductos.name = 'cantidad_productos';
+
+    cantidadProductos.value = carrito.length;
+
+
+    datosVenta.appendChild(cantidadProductos);
+
+}
+
+</script>
+
+
+{% endblock %}

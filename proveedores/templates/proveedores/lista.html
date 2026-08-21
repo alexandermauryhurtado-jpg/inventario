@@ -1,0 +1,129 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Proveedores | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Proveedores</h1>
+            <p>Gestiona los proveedores del sistema.</p>
+        </div>
+
+        <a href="/proveedores/nuevo/" class="boton-principal">
+             Nuevo proveedor
+        </a>
+
+    </div>
+
+
+    <form method="GET" class="barra-busqueda">
+
+        <input
+            type="text"
+            name="buscar"
+            value="{{ busqueda }}"
+            placeholder="🔎 Buscar proveedor..."
+        >
+
+        <button type="submit" class="boton-buscar">
+            Buscar
+        </button>
+
+    </form>
+
+
+    <div class="tabla-contenedor">
+
+        <table class="tabla-productos">
+
+            <thead>
+
+                <tr>
+                    <th>Nombre</th>
+                    <th>Documento</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Ciudad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for proveedor in proveedores %}
+
+                <tr>
+
+                    <td>
+                        <strong>{{ proveedor.nombre }}</strong>
+                    </td>
+
+                    <td>
+                        {{ proveedor.documento }}
+                    </td>
+
+                    <td>
+                        {{ proveedor.telefono }}
+                    </td>
+
+                    <td>
+                        {{ proveedor.correo }}
+                    </td>
+
+                    <td>
+                        {{ proveedor.ciudad }}
+                    </td>
+
+                    <td>
+
+                        <span class="estado-activo">
+                            ● Activo
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a
+                          href="{% url 'editar_proveedor' proveedor.id %}"
+                          class="boton-editar"
+                          >
+                           ✏️
+                        </a>
+
+                       <a
+                         href="{% url 'eliminar_proveedor' proveedor.id %}"
+                         class="boton-eliminar"
+                         >
+                          🗑️
+                       </a>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7">
+                        No hay proveedores registrados.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

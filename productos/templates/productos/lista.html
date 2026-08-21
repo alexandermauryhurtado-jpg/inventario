@@ -1,0 +1,158 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Productos | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Productos</h1>
+            <p>Gestiona los productos del inventario.</p>   
+        </div>
+
+        <a href=" /productos/nuevo/" class="boton-principal">   
+              Nuevo producto
+        </a>
+
+    </div>
+
+
+    <form method="GET" class="barra-busqueda">
+
+        <input
+            type="text"
+            name="buscar"
+            value="{{ busqueda }}"
+            placeholder="🔎 Buscar producto..."
+       >
+
+        <button type="submit" class="boton-buscar">
+            Buscar
+        </button>
+
+    </form>
+
+
+    <div class="tabla-contenedor">
+
+        <table class="tabla-productos">
+
+            <thead>
+
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Precio compra</th>
+                    <th>Precio venta</th>
+                    <th>Stock</th>
+                    <th>Stock mínimo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for producto in productos %}
+
+                <tr>
+
+                    <td>
+                        {{ producto.codigo }}
+                    </td>
+
+                    <td>
+                        <strong>{{ producto.nombre }}</strong>
+                    </td>
+
+                    <td>
+                        ${{ producto.precio_compra }}
+                    </td>
+
+                    <td>
+                        ${{ producto.precio_venta }}
+                    </td>
+
+                    <td>
+
+                        {% if producto.stock <= producto.stock_minimo %}
+
+                            <span class="stock-bajo">
+                                ⚠️ {{ producto.stock }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="stock-normal">
+                                {{ producto.stock }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ producto.stock_minimo }}
+                    </td>
+
+                    <td>
+
+                        {% if producto.activo %}
+
+                            <span class="estado-activo">
+                                ● Activo
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado-inactivo">
+                                ● Inactivo
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <a
+                           href="/productos/{{ producto.id }}/editar/"
+                           class="boton-editar"
+                          >
+                           ✏️
+                        </a>
+
+                        <a
+                           href="/productos/{{ producto.id }}/eliminar/"
+                           class="boton-eliminar"
+                          >
+                          🗑️
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="8">
+                        No hay productos registrados.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

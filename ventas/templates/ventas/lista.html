@@ -1,0 +1,435 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Ventas | Sistema de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="pagina-productos">
+
+    <!-- ENCABEZADO -->
+
+    <div class="encabezado-pagina">
+
+        <div>
+            <h1> Ventas</h1>
+            <p>Gestiona las ventas realizadas.</p>
+        </div>
+
+        <a
+            href="/ventas/nuevo/"
+            class="boton-principal"
+        >
+             Nueva venta
+        </a>
+
+    </div>
+
+
+    <!-- RESUMEN -->
+
+    <div class="resumen-ventas">
+
+        <div class="tarjeta-resumen">
+
+            <span class="icono-resumen">🛒</span>
+
+            <div>
+                <p>Total ventas</p>
+
+                <strong>
+                    {{ ventas|length }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="tarjeta-resumen">
+
+            <span class="icono-resumen">💰</span>
+
+            <div>
+                <p>Ingresos</p>
+
+                <strong id="total-ingresos">
+                    $0
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="tarjeta-resumen">
+
+            <span class="icono-resumen">✅</span>
+
+            <div>
+                <p>Confirmadas</p>
+
+                <strong id="ventas-confirmadas">
+                    0
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <div class="filtros-ventas">
+
+        <input
+            type="text"
+            id="buscar-venta"
+            placeholder="🔎 Buscar venta, cliente o producto..."
+        >
+
+
+        <select id="filtro-estado">
+
+            <option value="TODAS">
+                Todas las ventas
+            </option>
+
+            <option value="CONFIRMADA">
+                Confirmadas
+            </option>
+
+            <option value="PENDIENTE">
+                Pendientes
+            </option>
+
+            <option value="CANCELADA">
+                Canceladas
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- TABLA -->
+
+    <div class="tabla-contenedor">
+
+        <table class="tabla-productos">
+
+            <thead>
+
+                <tr>
+
+                    <th>Venta</th>
+
+                    <th>Cliente</th>
+
+                    <th>Fecha</th>
+
+                    <th>Productos</th>
+
+                    <th>Total</th>
+
+                    <th>Estado</th>
+
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tabla-ventas">
+
+                {% for venta in ventas %}
+
+                <tr
+                    class="fila-venta"
+                    data-estado="{{ venta.estado }}"
+                    data-busqueda="
+                        venta {{ venta.id }}
+                        {% if venta.cliente %}
+                            {{ venta.cliente.nombre }}
+                        {% else %}
+                            consumidor final
+                        {% endif %}
+                        {% for detalle in venta.detalles.all %}
+                            {{ detalle.producto.nombre }}
+                        {% endfor %}
+                    "
+                >
+
+                    <!-- VENTA -->
+
+                    <td>
+
+                        <strong>
+                            Venta #{{ venta.id }}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- CLIENTE -->
+
+                    <td>
+
+                        {% if venta.cliente %}
+
+                            {{ venta.cliente.nombre }}
+
+                        {% else %}
+
+                            <span>
+                                Consumidor final
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- FECHA -->
+
+                    <td>
+
+                        {{ venta.fecha|date:"d/m/Y H:i" }}
+
+                    </td>
+
+
+                    <!-- PRODUCTOS -->
+
+                    <td>
+
+                        <div class="productos-venta">
+
+                            {% for detalle in venta.detalles.all %}
+
+                            <div>
+
+                                <strong>
+                                    {{ detalle.producto.nombre }}
+                                </strong>
+
+                                <span>
+                                    × {{ detalle.cantidad }}
+                                </span>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- TOTAL -->
+
+                    <td>
+
+                        <strong class="total-venta-tabla">
+
+                            ${{ venta.total }}
+
+                        </strong>
+
+                    </td>
+
+
+                    <!-- ESTADO -->
+
+                    <td>
+
+                        {% if venta.estado == 'CONFIRMADA' %}
+
+                            <span class="estado-activo">
+                                ● Confirmada
+                            </span>
+
+                        {% elif venta.estado == 'PENDIENTE' %}
+
+                            <span class="estado-inactivo">
+                                ● Pendiente
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado-inactivo">
+                                ● Cancelada
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ACCIONES -->
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="boton-ver"
+                            onclick="verVenta({{ venta.id }})"
+                        >
+                            👁️
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7">
+
+                        No hay ventas registradas.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+const buscador = document.getElementById(
+    'buscar-venta'
+);
+
+const filtroEstado = document.getElementById(
+    'filtro-estado'
+);
+
+const filas = document.querySelectorAll(
+    '.fila-venta'
+);
+
+
+// BUSCAR Y FILTRAR
+
+function filtrarVentas() {
+
+    const texto = buscador.value
+        .toLowerCase()
+        .trim();
+
+    const estado = filtroEstado.value;
+
+
+    filas.forEach(function(fila) {
+
+        const contenido =
+            fila.dataset.busqueda.toLowerCase();
+
+        const estadoVenta =
+            fila.dataset.estado;
+
+
+        const coincideTexto =
+            contenido.includes(texto);
+
+        const coincideEstado =
+            estado === 'TODAS' ||
+            estadoVenta === estado;
+
+
+        if (
+            coincideTexto &&
+            coincideEstado
+        ) {
+
+            fila.style.display = '';
+
+        } else {
+
+            fila.style.display = 'none';
+
+        }
+
+    });
+
+}
+
+
+buscador.addEventListener(
+    'input',
+    filtrarVentas
+);
+
+
+filtroEstado.addEventListener(
+    'change',
+    filtrarVentas
+);
+
+
+// RESUMEN
+
+let ingresos = 0;
+
+let confirmadas = 0;
+
+
+{% for venta in ventas %}
+
+    {% if venta.estado == 'CONFIRMADA' %}
+
+        ingresos += parseFloat(
+            '{{ venta.total }}'
+        );
+
+        confirmadas++;
+
+    {% endif %}
+
+{% endfor %}
+
+
+document.getElementById(
+    'total-ingresos'
+).textContent =
+    '$' + ingresos.toLocaleString(
+        'es-CO'
+    );
+
+
+document.getElementById(
+    'ventas-confirmadas'
+).textContent =
+    confirmadas;
+
+
+// DETALLE
+
+function verVenta(id) {
+
+    alert(
+        'Detalle de la Venta #' + id
+        + '\n\n'
+        + 'Próximamente mostraremos '
+        + 'el detalle completo de la venta.'
+    );
+
+}
+
+</script>
+
+
+{% endblock %}

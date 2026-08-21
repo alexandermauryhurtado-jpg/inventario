@@ -1,0 +1,168 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2>Dashboard</h2>
+
+<p>Resumen general del sistema.</p>
+
+<div class="tarjetas">
+
+    <div class="tarjeta">
+        <h3>📦 Productos</h3>
+        <p class="numero">{{ total_productos }}</p>
+    </div>
+
+    <div class="tarjeta">
+        <h3>👥 Clientes</h3>
+        <p class="numero">{{ total_clientes }}</p>
+    </div>
+
+    <div class="tarjeta">
+        <h3>🚚 Proveedores</h3>
+        <p class="numero">{{ total_proveedores }}</p>
+    </div>
+
+    <div class="tarjeta">
+        <h3>🧾 Ventas</h3>
+        <p class="numero">{{ total_ventas }}</p>
+    </div>
+
+    <div class="tarjeta">
+        <h3>📊 Stock Total</h3>
+        <p class="numero">{{ stock_total }}</p>
+    </div>
+
+    <div class="seccion-alertas">
+
+    <h2>⚠️ Alertas de stock</h2>
+
+    {% if productos_stock_bajo %}
+
+        {% for producto in productos_stock_bajo %}
+
+            <div class="alerta">
+                <strong>{{ producto.nombre }}</strong>
+
+                <span>
+                    Stock: {{ producto.stock }}
+                    | Mínimo: {{ producto.stock_minimo }}
+                </span>
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="sin-alertas">
+            ✅ No hay productos con stock bajo.
+        </div>
+
+    {% endif %}
+
+
+    <div class="seccion-ventas">
+
+    <h2>🧾 Últimas ventas</h2>
+
+    {% if ultimas_ventas %}
+
+        <table class="tabla-ventas">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for venta in ultimas_ventas %}
+
+                    <tr>
+                        <td>#{{ venta.id }}</td>
+                        <td>{{ venta.cliente.nombre }}</td>
+                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>${{ venta.total }}</td>
+                        <td>{{ venta.estado }}</td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>No hay ventas registradas.</p>
+
+    {% endif %}
+
+
+    <div class="seccion-movimientos">
+
+    <h2>📥 Últimos movimientos</h2>
+
+    {% if ultimos_movimientos %}
+
+        <table class="tabla-movimientos">
+
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Motivo</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for movimiento in ultimos_movimientos %}
+
+                    <tr>
+                        <td>{{ movimiento.producto.nombre }}</td>
+
+                        <td>
+                            {% if movimiento.tipo == 'ENTRADA' %}
+                                🟢 ENTRADA
+                            {% else %}
+                                🔴 SALIDA
+                            {% endif %}
+                        </td>
+
+                        <td>{{ movimiento.cantidad }}</td>
+
+                        <td>{{ movimiento.motivo }}</td>
+
+                        <td>
+                            {{ movimiento.fecha|date:"d/m/Y H:i" }}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>No hay movimientos registrados.</p>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}
