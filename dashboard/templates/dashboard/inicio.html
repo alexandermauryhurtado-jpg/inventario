@@ -10,6 +10,11 @@ Dashboard
 
 <p>Resumen general del sistema.</p>
 
+
+<!-- =========================
+     TARJETAS PRINCIPALES
+========================= -->
+
 <div class="tarjetas">
 
     <div class="tarjeta">
@@ -32,12 +37,29 @@ Dashboard
         <p class="numero">{{ total_ventas }}</p>
     </div>
 
-    <div class="tarjeta">
-        <h3>📊 Stock Total</h3>
-        <p class="numero">{{ stock_total }}</p>
-    </div>
+</div>
 
-    <div class="seccion-alertas">
+
+<!-- =========================
+     STOCK TOTAL
+========================= -->
+
+<div class="tarjeta tarjeta-stock">
+
+    <h3>📊 Stock Total</h3>
+
+    <p class="numero">
+        {{ stock_total }}
+    </p>
+
+</div>
+
+
+<!-- =========================
+     ALERTAS
+========================= -->
+
+<div class="seccion-alertas">
 
     <h2>⚠️ Alertas de stock</h2>
 
@@ -46,12 +68,17 @@ Dashboard
         {% for producto in productos_stock_bajo %}
 
             <div class="alerta">
-                <strong>{{ producto.nombre }}</strong>
+
+                <strong>
+                    {{ producto.nombre }}
+                </strong>
 
                 <span>
                     Stock: {{ producto.stock }}
-                    | Mínimo: {{ producto.stock_minimo }}
+                    |
+                    Mínimo: {{ producto.stock_minimo }}
                 </span>
+
             </div>
 
         {% endfor %}
@@ -64,103 +91,166 @@ Dashboard
 
     {% endif %}
 
+</div>
+
+
+<!-- =========================
+     VENTAS + MOVIMIENTOS
+========================= -->
+
+<div class="dashboard-columnas">
+
+
+    <!-- ÚLTIMAS VENTAS -->
 
     <div class="seccion-ventas">
 
-    <h2>🧾 Últimas ventas</h2>
+        <h2>🧾 Últimas ventas</h2>
 
-    {% if ultimas_ventas %}
+        {% if ultimas_ventas %}
 
-        <table class="tabla-ventas">
+            <div class="tabla-dashboard">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
+                <table class="tabla-ventas">
 
-            <tbody>
+                    <thead>
 
-                {% for venta in ultimas_ventas %}
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
 
-                    <tr>
-                        <td>#{{ venta.id }}</td>
-                        <td>{{ venta.cliente.nombre }}</td>
-                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
-                        <td>${{ venta.total }}</td>
-                        <td>{{ venta.estado }}</td>
-                    </tr>
+                    </thead>
 
-                {% endfor %}
+                    <tbody>
 
-            </tbody>
+                        {% for venta in ultimas_ventas %}
 
-        </table>
+                            <tr>
 
-    {% else %}
+                                <td>
+                                    #{{ venta.id }}
+                                </td>
 
-        <p>No hay ventas registradas.</p>
+                                <td>
+                                    {% if venta.cliente %}
+                                        {{ venta.cliente.nombre }}
+                                    {% else %}
+                                        Consumidor final
+                                    {% endif %}
+                                </td>
 
-    {% endif %}
+                                <td>
+                                    {{ venta.fecha|date:"d/m/Y H:i" }}
+                                </td>
 
+                                <td>
+                                    ${{ venta.total }}
+                                </td>
+
+                                <td>
+                                    {{ venta.estado }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <p>No hay ventas registradas.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ÚLTIMOS MOVIMIENTOS -->
 
     <div class="seccion-movimientos">
 
-    <h2>📥 Últimos movimientos</h2>
+        <h2>📥 Últimos movimientos</h2>
 
-    {% if ultimos_movimientos %}
+        {% if ultimos_movimientos %}
 
-        <table class="tabla-movimientos">
+            <div class="tabla-dashboard">
 
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Tipo</th>
-                    <th>Cantidad</th>
-                    <th>Motivo</th>
-                    <th>Fecha</th>
-                </tr>
-            </thead>
+                <table class="tabla-movimientos">
 
-            <tbody>
+                    <thead>
 
-                {% for movimiento in ultimos_movimientos %}
+                        <tr>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Motivo</th>
+                            <th>Fecha</th>
+                        </tr>
 
-                    <tr>
-                        <td>{{ movimiento.producto.nombre }}</td>
+                    </thead>
 
-                        <td>
-                            {% if movimiento.tipo == 'ENTRADA' %}
-                                🟢 ENTRADA
-                            {% else %}
-                                🔴 SALIDA
-                            {% endif %}
-                        </td>
+                    <tbody>
 
-                        <td>{{ movimiento.cantidad }}</td>
+                        {% for movimiento in ultimos_movimientos %}
 
-                        <td>{{ movimiento.motivo }}</td>
+                            <tr>
 
-                        <td>
-                            {{ movimiento.fecha|date:"d/m/Y H:i" }}
-                        </td>
-                    </tr>
+                                <td>
+                                    {{ movimiento.producto.nombre }}
+                                </td>
 
-                {% endfor %}
+                                <td>
 
-            </tbody>
+                                    {% if movimiento.tipo == 'ENTRADA' %}
 
-        </table>
+                                        🟢 ENTRADA
 
-    {% else %}
+                                    {% else %}
 
-        <p>No hay movimientos registrados.</p>
+                                        🔴 SALIDA
 
-    {% endif %}
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ movimiento.cantidad }}
+                                </td>
+
+                                <td>
+                                    {{ movimiento.motivo }}
+                                </td>
+
+                                <td>
+                                    {{ movimiento.fecha|date:"d/m/Y H:i" }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <p>No hay movimientos registrados.</p>
+
+        {% endif %}
+
+    </div>
 
 </div>
 
